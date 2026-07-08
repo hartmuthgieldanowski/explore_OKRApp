@@ -1,0 +1,99 @@
+/* Wertwandler Typography Tokens
+   
+   Font substitution note:
+   - Cambria (PPTX headings) → Source Serif 4 from Google Fonts
+   - Calibri (PPTX body) → Source Sans 3 from Google Fonts
+   - Fira Code (mono) → real webfont files supplied by user, self-hosted below
+   
+   If original Cambria/Calibria files become available, replace the
+   @font-face declarations and update --font-serif / --font-sans.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap');
+
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../assets/fonts/FiraCode-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../assets/fonts/FiraCode-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../assets/fonts/FiraCode-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../assets/fonts/FiraCode-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../assets/fonts/FiraCode-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Font families */
+  --font-serif: 'Source Serif 4', 'Cambria', Georgia, serif;
+  --font-sans: 'Source Sans 3', 'Calibri', 'Helvetica Neue', sans-serif;
+  --font-mono: 'Fira Code', 'SF Mono', monospace;
+
+  /* Semantic font aliases */
+  --font-display: var(--font-serif);
+  --font-heading: var(--font-serif);
+  --font-body: var(--font-sans);
+  --font-ui: var(--font-sans);
+  --font-caption: var(--font-sans);
+
+  /* Font sizes — modular scale (1.25 ratio) */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+  --text-6xl: 3.75rem;   /* 60px */
+
+  /* Font weights */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Line heights */
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* Letter spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.1em;
+
+  /* Slide-specific sizes (for 1920×1080 canvas) */
+  --slide-title: 42px;
+  --slide-subtitle: 24px;
+  --slide-body: 17px;
+  --slide-label: 14px;
+  --slide-number: 11px;
+}

@@ -1,0 +1,126 @@
+@font-face {
+  font-family: 'Fira Code';
+  src: url('/fonts/FiraCode-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('/fonts/FiraCode-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('/fonts/FiraCode-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('/fonts/FiraCode-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fira Code';
+  src: url('/fonts/FiraCode-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #f7f7f7;
+  font-family: 'Source Sans 3', 'Calibri', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: #fc971c;
+}
+a:hover {
+  color: #e07a00;
+}
+
+button {
+  font-family: inherit;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #fc971c !important;
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+@keyframes wwfade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes wwpop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes wwblink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.ww-app-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #f7f7f7;
+  position: relative;
+  overflow-x: hidden;
+}
+
+@media (min-width: 481px) {
+  .ww-app-shell {
+    min-height: 100vh;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  }
+}

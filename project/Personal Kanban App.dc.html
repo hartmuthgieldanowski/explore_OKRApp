@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wertwandler-design-system-207891cb-d4dd-493e-ad82-f8974b175155/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wertwandler-design-system-207891cb-d4dd-493e-ad82-f8974b175155/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wertwandler-design-system-207891cb-d4dd-493e-ad82-f8974b175155/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wertwandler-design-system-207891cb-d4dd-493e-ad82-f8974b175155/styles.css">
+  <script src="_ds/wertwandler-design-system-207891cb-d4dd-493e-ad82-f8974b175155/_ds_bundle.js"></script>
+  <template id="__bundler_thumbnail">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" fill="#1A1A1A"></rect>
+      <rect x="30" y="34" width="10" height="32" rx="2" fill="#FC971C"></rect>
+      <rect x="45" y="34" width="10" height="22" rx="2" fill="#FFFFFF"></rect>
+      <rect x="60" y="34" width="10" height="27" rx="2" fill="#BBBBBB"></rect>
+    </svg>
+  </template>
+  <style>
+    body{margin:0;background:#E9E7E2;font-family:'Source Sans 3','Calibri',sans-serif}
+    a{color:#FC971C}a:hover{color:#E07A00}
+    @keyframes wwfade{from{opacity:0}to{opacity:1}}
+    @keyframes wwpop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1);opacity:1}}
+    @keyframes wwblink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+    ::-webkit-scrollbar{width:0;height:0}
+    input:focus,textarea:focus{border-color:#FC971C !important;outline:none}
+  </style>
+</helmet>
+<div style="min-height:100vh;display:grid;place-items:center;padding:36px 16px;box-sizing:border-box">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ statusDark }}" hint-size="402px,874px">
+<div style="height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden;background:#F7F7F7">
+
+  <!-- ─── WELCOME ─── -->
+  <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1;display:flex;flex-direction:column;background:#1A1A1A;padding:96px 28px 44px;box-sizing:border-box;overflow:auto">
+      <img src="assets/logo-white.png" alt="Wertwandler" style="width:52px;height:52px;object-fit:contain;align-self:flex-start">
+      <h1 style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:30px;line-height:1.15;color:#FFFFFF;margin:26px 0 12px">Kultiviere den Wandel — bei dir selbst.</h1>
+      <p style="font-size:16px;line-height:1.5;color:#BBBBBB;margin:0 0 26px">Maximal drei persönliche Ziele im OKR-Format. Und ein Kanban-Board für den Weg dorthin.</p>
+      <div style="display:flex;flex-direction:column;gap:13px;margin-bottom:auto">
+        <sc-for list="{{ introStages }}" as="st" hint-placeholder-count="4">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="width:9px;height:9px;border-radius:50%;background:#FC971C;flex:none;margin-top:6px"></span>
+            <div style="font-size:14.5px;line-height:1.4"><span style="color:#FFFFFF;font-weight:600">{{ st.label }}</span><span style="color:#8A8A8A"> — {{ st.sub }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:30px">
+        <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="primary" size="lg" onClick="{{ startBuilder }}" dc-props="{{ btnFull }}" hint-size="100%,52px">Erstes Ziel formulieren</x-import>
+        <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="secondary-dark" size="md" onClick="{{ seedDemo }}" dc-props="{{ btnFull }}" hint-size="100%,44px">Beispiel ansehen</x-import>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ─── BUILDER (AI) ─── -->
+  <sc-if value="{{ isBuilder }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0;background:#FFFFFF">
+      <div style="padding:66px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #EEEEEE;background:#FFFFFF">
+        <button onClick="{{ goBack }}" style="width:44px;height:44px;border:none;background:transparent;font-size:22px;color:#1A1A1A;cursor:pointer;border-radius:4px">←</button>
+        <div>
+          <div style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:20px;color:#1A1A1A">Neues Ziel</div>
+          <div style="font-size:13px;color:#777777">{{ builderSub }}</div>
+        </div>
+      </div>
+      <sc-if value="{{ isChatFlow }}" hint-placeholder-val="{{ true }}">
+        <div ref="{{ chatRef }}" style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ chatMsgs }}" as="m" hint-placeholder-count="1">
+            <div style="{{ m.bubbleStyle }}">{{ m.text }}</div>
+          </sc-for>
+          <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}">
+            <div style="align-self:flex-start;padding:12px 16px;background:#F7F7F7;border:1px solid #EEEEEE;border-radius:8px;color:#777777;font-size:18px;display:flex;gap:3px;line-height:1">
+              <span style="animation:wwblink 1.2s infinite">·</span><span style="animation:wwblink 1.2s .2s infinite">·</span><span style="animation:wwblink 1.2s .4s infinite">·</span>
+            </div>
+          </sc-if>
+        </div>
+        <div style="padding:10px 12px 38px;border-top:1px solid #EEEEEE;display:flex;gap:8px;background:#FFFFFF">
+          <input value="{{ chatInput }}" onChange="{{ onChatInput }}" onKeyDown="{{ onChatKey }}" placeholder="Deine Antwort …" style="flex:1;height:46px;padding:0 14px;border:1.5px solid #D9D9D9;border-radius:4px;font-size:16px;font-family:'Source Sans 3',sans-serif;color:#1A1A1A;background:#FFFFFF;box-sizing:border-box">
+          <button onClick="{{ sendChat }}" style="width:46px;height:46px;border:none;background:#FC971C;color:#FFFFFF;font-size:20px;border-radius:4px;cursor:pointer;flex:none" style-hover="background:#E07A00">→</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isPromptFlow }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;overflow:auto;padding:22px 20px 40px;display:flex;flex-direction:column;gap:16px">
+          <p style="font-size:15.5px;line-height:1.5;color:#1A1A1A;margin:0">Beschreib in deinen Worten, was du in den nächsten drei Monaten für dich verändern willst — und woran du Fortschritt merken würdest.</p>
+          <textarea value="{{ promptInput }}" onChange="{{ onPromptInput }}" rows="{{ six }}" placeholder="z. B. Ich will wieder regelmässig Sport machen, mir fehlt Energie im Alltag …" style="width:100%;box-sizing:border-box;padding:14px;border:1.5px solid #D9D9D9;border-radius:4px;font-size:16px;line-height:1.5;font-family:'Source Sans 3',sans-serif;color:#1A1A1A;resize:none"></textarea>
+          <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:14px;color:#777777;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#FC971C;animation:wwblink 1.2s infinite"></span>Dein OKR-Set entsteht …</div>
+          </sc-if>
+          <sc-if value="{{ aiError }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;color:#C62828">{{ aiError }}</div></sc-if>
+          <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="primary" size="lg" onClick="{{ genFromPrompt }}" dc-props="{{ btnFull }}" hint-size="100%,52px">OKR-Set entwerfen</x-import>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ─── DRAFT (edit OKR) ─── -->
+  <sc-if value="{{ isDraft }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <div style="padding:66px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #EEEEEE;background:#FFFFFF">
+        <button onClick="{{ goBack }}" style="width:44px;height:44px;border:none;background:transparent;font-size:22px;color:#1A1A1A;cursor:pointer;border-radius:4px">←</button>
+        <div>
+          <div style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:20px;color:#1A1A1A">{{ draftTitle }}</div>
+          <div style="font-size:13px;color:#777777">Passe alles an — es ist deins.</div>
+        </div>
+      </div>
+      <div style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:14px">
+        <div style="background:#FFFFFF;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="width:9px;height:9px;border-radius:50%;background:#FC971C"></span>
+            <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#777777">Objective</span>
+          </div>
+          <textarea value="{{ draftObjective }}" onChange="{{ onDraftObjective }}" rows="{{ three }}" style="width:100%;box-sizing:border-box;padding:12px;border:1.5px solid #D9D9D9;border-radius:4px;font-family:'Source Serif 4','Cambria',serif;font-size:17px;line-height:1.4;color:#1A1A1A;resize:none"></textarea>
+        </div>
+        <div style="background:#FFFFFF;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="width:9px;height:9px;border-radius:50%;background:#FC971C"></span>
+            <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#777777">Key Results</span>
+            <span style="margin-left:auto;font-size:12px;color:#999999">2–3 leitende Metriken</span>
+          </div>
+          <sc-for list="{{ draftKrs }}" as="kr" hint-placeholder-count="2">
+            <div style="padding:14px 0;border-bottom:1px solid #EEEEEE;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:8px;align-items:center">
+                <input value="{{ kr.text }}" onChange="{{ kr.onText }}" placeholder="Key Result …" style="flex:1;height:42px;padding:0 12px;border:1.5px solid #D9D9D9;border-radius:4px;font-size:15px;font-family:'Source Sans 3',sans-serif;color:#1A1A1A;box-sizing:border-box;min-width:0">
+                <sc-if value="{{ kr.canRemove }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ kr.onRemove }}" style="width:42px;height:42px;border:none;background:transparent;color:#999999;font-size:17px;cursor:pointer;flex:none">✕</button>
+                </sc-if>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div style="display:flex;flex-direction:column;gap:2px"><label style="font-size:11px;color:#999999">Start</label><input value="{{ kr.start }}" onChange="{{ kr.onStart }}" type="number" style="width:64px;height:40px;padding:0 8px;border:1.5px solid #D9D9D9;border-radius:4px;font-size:15px;box-sizing:border-box"></div>
+                <div style="display:flex;flex-direction:column;gap:2px"><label style="font-size:11px;color:#999999">Ziel</label><input value="{{ kr.target }}" onChange="{{ kr.onTarget }}" type="number" style="width:64px;height:40px;padding:0 8px;border:1.5px solid #D9D9D9;border-radius:4px;font-size:15px;box-sizing:border-box"></div>
+                <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><label style="font-size:11px;color:#999999">Einheit</label><input value="{{ kr.unit }}" onChange="{{ kr.onUnit }}" placeholder="z. B. x / Woche" style="width:100%;height:40px;padding:0 10px;border:1.5px solid #D9D9D9;border-radius:4px;font-size:15px;box-sizing:border-box"></div>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ canAddKr }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ addKr }}" style="margin-top:10px;height:44px;padding:0 8px;border:none;background:transparent;color:#E07A00;font-size:15px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">＋ Key Result hinzufügen</button>
+          </sc-if>
+        </div>
+        <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="primary" size="lg" onClick="{{ saveDraft }}" dc-props="{{ btnFull }}" hint-size="100%,52px">Ziel übernehmen</x-import>
+        <sc-if value="{{ isEditingGoal }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ deleteGoal }}" style="height:44px;border:none;background:transparent;color:#C62828;font-size:14.5px;cursor:pointer;font-family:'Source Sans 3',sans-serif">Ziel löschen</button>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ─── KICKOFF (congrats + first options) ─── -->
+  <sc-if value="{{ isKickoff }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0;background:#1A1A1A">
+      <div style="padding:92px 24px 0">
+        <img src="assets/logo-white.png" alt="" style="width:44px;height:44px;object-fit:contain;animation:wwpop 0.5s ease-out">
+        <div style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:26px;color:#FFFFFF;margin-top:16px;line-height:1.15">Stark. Dein Ziel steht.</div>
+        <div style="font-size:14.5px;color:#BBBBBB;margin-top:8px;line-height:1.5">{{ kickoffObjective }}</div>
+      </div>
+      <div style="flex:1;overflow:auto;padding:22px 24px 30px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+          <span style="width:9px;height:9px;border-radius:50%;background:#FC971C"></span>
+          <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#777777">Erste Optionen</span>
+        </div>
+        <div style="font-size:14px;color:#BBBBBB;line-height:1.45;margin-bottom:4px">Aus deinen Key Results abgeleitet — wähl aus, was aufs Board soll. Klein anfangen. Konkret.</div>
+        <sc-if value="{{ kickoffLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:14px;color:#777777;display:flex;align-items:center;gap:8px;padding:8px 0"><span style="width:8px;height:8px;border-radius:50%;background:#FC971C;animation:wwblink 1.2s infinite"></span>Die KI leitet Optionen aus deinen Key Results ab …</div>
+        </sc-if>
+        <sc-if value="{{ kickoffError }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:14px;color:#FDB950">{{ kickoffError }}</div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ kickoffSuggestions }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.onTap }}" style="{{ s.style }}">
+              <span style="{{ s.dotStyle }}"></span>
+              <span style="min-width:0">{{ s.text }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:2px">
+          <input value="{{ kickoffInput }}" onChange="{{ onKickoffInput }}" onKeyDown="{{ onKickoffKey }}" placeholder="Eigene Option …" style="flex:1;height:46px;padding:0 14px;border:1.5px solid #3A3A3A;border-radius:4px;font-size:15px;font-family:'Source Sans 3',sans-serif;color:#FFFFFF;background:#2A2A2A;box-sizing:border-box;min-width:0">
+          <button onClick="{{ addKickoffOwn }}" style="width:46px;height:46px;border:none;background:#FC971C;color:#FFFFFF;font-size:20px;border-radius:4px;cursor:pointer;flex:none" style-hover="background:#E07A00">＋</button>
+        </div>
+        <sc-if value="{{ kickoffCanRegen }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ regenOptions }}" style="align-self:flex-start;height:40px;padding:0 4px;border:none;background:transparent;color:#BBBBBB;font-size:13.5px;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-decoration:underline;text-underline-offset:3px">Andere Vorschläge</button>
+        </sc-if>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:18px">
+          <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="primary" size="lg" onClick="{{ kickoffToBoard }}" dc-props="{{ btnFull }}" hint-size="100%,52px">{{ kickoffCta }}</x-import>
+          <button onClick="{{ kickoffSkip }}" style="height:44px;border:none;background:transparent;color:#777777;font-size:14px;cursor:pointer;font-family:'Source Sans 3',sans-serif">Später — direkt zum Board</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ─── GOALS ─── -->
+  <sc-if value="{{ isGoals }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <div style="padding:66px 20px 14px;display:flex;align-items:center;gap:10px;background:#F7F7F7">
+        <img src="assets/LogoWW_006.png" alt="" style="width:26px;height:26px;object-fit:contain">
+        <div style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:22px;color:#1A1A1A">Meine Ziele</div>
+        <span style="margin-left:auto;font-size:12px;font-weight:600;padding:3px 10px;background:#EEEEEE;color:#1A1A1A;border-radius:2px">{{ goalCountLabel }}</span>
+      </div>
+      <div style="flex:1;overflow:auto;padding:6px 16px 24px;display:flex;flex-direction:column;gap:14px">
+        <sc-for list="{{ goalVMs }}" as="g" hint-placeholder-count="1">
+          <div style="background:#FFFFFF;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:18px 16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span style="width:9px;height:9px;border-radius:50%;background:#FC971C"></span>
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#777777">{{ g.label }}</span>
+              <button onClick="{{ g.onEdit }}" style="margin-left:auto;height:34px;padding:0 12px;border:1.5px solid #D9D9D9;background:transparent;color:#1A1A1A;font-size:13px;font-weight:600;border-radius:4px;cursor:pointer;font-family:'Source Sans 3',sans-serif">Bearbeiten</button>
+            </div>
+            <div style="font-family:'Source Serif 4','Cambria',serif;font-size:19px;font-weight:600;line-height:1.3;color:#1A1A1A;margin-bottom:16px">{{ g.objective }}</div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <sc-for list="{{ g.krs }}" as="kr" hint-placeholder-count="2">
+                <div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:14px;color:#1A1A1A"><span style="min-width:0">{{ kr.text }}</span><span style="color:#777777;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">{{ kr.valueLabel }}</span></div>
+                  <div style="height:6px;background:#EEEEEE;border-radius:2px;margin-top:6px;overflow:hidden"><div style="{{ kr.fillStyle }}"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ hasNoGoals }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:40px 20px;color:#777777;font-size:15px;line-height:1.5">Noch kein Ziel. Die KI hilft dir, dein erstes OKR-Set zu formulieren.</div>
+        </sc-if>
+        <sc-if value="{{ canAddGoal }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="secondary" size="md" onClick="{{ startBuilder }}" dc-props="{{ btnFull }}" hint-size="100%,44px">＋ Neues Ziel mit KI formulieren</x-import>
+        </sc-if>
+        <sc-if value="{{ atGoalLimit }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#999999;text-align:center">Maximal drei Ziele — Fokus schlägt Fülle.</div>
+        </sc-if>
+        <button onClick="{{ resetAll }}" style="margin-top:14px;height:40px;border:none;background:transparent;color:#BBBBBB;font-size:12.5px;cursor:pointer;font-family:'Source Sans 3',sans-serif">Prototyp zurücksetzen</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ─── BOARD ─── -->
+  <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <div style="padding:66px 20px 12px;display:flex;align-items:center;gap:10px;background:#F7F7F7">
+        <img src="assets/LogoWW_006.png" alt="" style="width:26px;height:26px;object-fit:contain">
+        <div style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:22px;color:#1A1A1A">Personal Kanban</div>
+        <sc-if value="{{ hasDone }}" hint-placeholder-val="{{ false }}">
+          <span style="margin-left:auto;font-size:12px;font-weight:600;padding:3px 10px;background:#FFF3E0;color:#E07A00;border-radius:2px">{{ doneLabel }}</span>
+        </sc-if>
+      </div>
+      <sc-if value="{{ boardNoGoals }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:16px;text-align:center">
+          <div style="color:#777777;font-size:15px;line-height:1.5">Dein Board braucht zuerst ein Ziel.</div>
+          <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="primary" size="md" onClick="{{ startBuilder }}" hint-size="auto,44px">Erstes Ziel formulieren</x-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{ boardHasGoals }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ layoutTabs }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:4px;padding:6px 16px 10px">
+            <sc-for list="{{ segTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onTap }}" style="{{ t.style }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="{{ boardWrapStyle }}">
+          <sc-for list="{{ visibleColumns }}" as="col" hint-placeholder-count="4">
+            <div style="{{ col.style }}">
+              <div style="display:flex;align-items:baseline;gap:8px">
+                <span style="width:9px;height:9px;border-radius:50%;background:#FC971C;flex:none;align-self:center"></span>
+                <span style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:17px;color:#1A1A1A">{{ col.label }}</span>
+                <span style="{{ col.countStyle }}">{{ col.countLabel }}</span>
+              </div>
+              <div style="font-size:12.5px;color:#777777;margin:2px 0 12px 17px">{{ col.sub }}</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ col.cards }}" as="card" hint-placeholder-count="1">
+                  <div onClick="{{ card.onTap }}" style="background:#FFFFFF;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:14px;cursor:pointer">
+                    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+                      <div style="font-size:15px;font-weight:600;color:#1A1A1A;line-height:1.35;min-width:0">{{ card.title }}</div>
+                      <span style="font-size:11px;font-weight:600;padding:2px 6px;background:#FFF3E0;color:#E07A00;border-radius:2px;flex:none">{{ card.goalTag }}</span>
+                    </div>
+                    <sc-if value="{{ card.showTries }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:5px;margin-top:10px">
+                        <sc-for list="{{ card.tryDots }}" as="d" hint-placeholder-count="3">
+                          <span style="{{ d.style }}"></span>
+                        </sc-for>
+                        <span style="font-size:12px;color:#777777;margin-left:4px">{{ card.triesLabel }}</span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ card.expanded }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #EEEEEE">
+                        <sc-if value="{{ card.canBack }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ card.onBack }}" style="height:40px;padding:0 12px;border:1.5px solid #D9D9D9;background:transparent;color:#595959;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;font-family:'Source Sans 3',sans-serif">←</button>
+                        </sc-if>
+                        <sc-if value="{{ card.canTry }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ card.onTry }}" style="height:40px;padding:0 14px;border:1.5px solid #D9D9D9;background:transparent;color:#1A1A1A;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;font-family:'Source Sans 3',sans-serif">＋ Versuch</button>
+                        </sc-if>
+                        <sc-if value="{{ card.canFwd }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ card.onFwd }}" style="{{ card.fwdStyle }}">{{ card.fwdLabel }}</button>
+                        </sc-if>
+                        <sc-if value="{{ card.isCelebrating }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ card.onReview }}" style="height:40px;padding:0 14px;border:none;background:#FC971C;color:#FFFFFF;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;font-family:'Source Sans 3',sans-serif">Review starten</button>
+                        </sc-if>
+                        <sc-if value="{{ card.canDelete }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ card.onDelete }}" style="height:40px;padding:0 10px;border:none;background:transparent;color:#999999;font-size:13.5px;cursor:pointer;font-family:'Source Sans 3',sans-serif">Entfernen</button>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{ card.note }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:8px;font-size:12.5px;color:#E07A00">{{ card.note }}</div>
+                      </sc-if>
+                    </sc-if>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ col.isEmpty }}" hint-placeholder-val="{{ false }}">
+                  <div style="border:1.5px dashed #D9D9D9;border-radius:4px;padding:18px 12px;font-size:13px;color:#999999;text-align:center;line-height:1.4">{{ col.emptyText }}</div>
+                </sc-if>
+                <sc-if value="{{ col.isOptions }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+                    <div style="display:flex;gap:8px">
+                      <input value="{{ newCardTitle }}" onChange="{{ onNewCardTitle }}" onKeyDown="{{ onNewCardKey }}" placeholder="Neue Option …" style="flex:1;height:44px;padding:0 12px;border:1.5px solid #D9D9D9;border-radius:4px;font-size:15px;font-family:'Source Sans 3',sans-serif;color:#1A1A1A;background:#FFFFFF;box-sizing:border-box;min-width:0">
+                      <button onClick="{{ addCard }}" style="width:44px;height:44px;border:none;background:#FC971C;color:#FFFFFF;font-size:20px;border-radius:4px;cursor:pointer;flex:none" style-hover="background:#E07A00">＋</button>
+                    </div>
+                    <sc-if value="{{ manyGoals }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:6px;align-items:center">
+                        <span style="font-size:12px;color:#999999">Für Ziel:</span>
+                        <sc-for list="{{ goalChips }}" as="chip" hint-placeholder-count="2">
+                          <button onClick="{{ chip.onTap }}" style="{{ chip.style }}">{{ chip.label }}</button>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ─── CELEBRATE REVIEW ─── -->
+  <sc-if value="{{ isCelebrate }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0;background:#1A1A1A">
+      <div style="padding:66px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #3A3A3A">
+        <button onClick="{{ backToBoard }}" style="width:44px;height:44px;border:none;background:transparent;font-size:22px;color:#FFFFFF;cursor:pointer;border-radius:4px">←</button>
+        <div>
+          <div style="font-family:'Source Serif 4','Cambria',serif;font-weight:700;font-size:20px;color:#FFFFFF">Feiern</div>
+          <div style="font-size:13px;color:#BBBBBB">Schau hin, was sich bewegt hat.</div>
+        </div>
+      </div>
+      <div style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:14px">
+        <div style="background:#2A2A2A;border:1px solid #3A3A3A;border-radius:4px;padding:16px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#777777;margin-bottom:8px">Geschafft</div>
+          <div style="font-family:'Source Serif 4','Cambria',serif;font-size:20px;font-weight:600;color:#FFFFFF;line-height:1.3">{{ celebrateTitle }}</div>
+          <div style="font-size:14px;color:#BBBBBB;margin-top:10px;line-height:1.45">{{ celebrateGoalObjective }}</div>
+        </div>
+        <div style="background:#2A2A2A;border:1px solid #3A3A3A;border-radius:4px;padding:4px 16px 12px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#777777;padding:14px 0 2px">Deine Key Results heute</div>
+          <sc-for list="{{ celebrateKrs }}" as="kr" hint-placeholder-count="2">
+            <div style="padding:14px 0;border-bottom:1px solid #3A3A3A">
+              <div style="font-size:15px;color:#FFFFFF">{{ kr.text }}</div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+                <button onClick="{{ kr.onMinus }}" style="width:44px;height:44px;border:1.5px solid #595959;background:transparent;color:#FFFFFF;font-size:20px;border-radius:4px;cursor:pointer;flex:none">−</button>
+                <div style="flex:1;text-align:center">
+                  <div style="font-family:'Fira Code',monospace;font-size:24px;font-weight:500;color:#FFFFFF">{{ kr.currentLabel }}</div>
+                  <div style="font-size:12px;color:#777777;margin-top:2px">{{ kr.metaLabel }}</div>
+                </div>
+                <button onClick="{{ kr.onPlus }}" style="width:44px;height:44px;border:1.5px solid #595959;background:transparent;color:#FFFFFF;font-size:20px;border-radius:4px;cursor:pointer;flex:none">＋</button>
+              </div>
+              <sc-if value="{{ kr.improved }}" hint-placeholder-val="{{ false }}">
+                <div style="color:#FC971C;font-size:13px;font-weight:600;margin-top:8px;text-align:center">{{ kr.deltaLabel }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <x-import component-from-global-scope="WertwandlerDesignSystem_207891.Button" variant="primary" size="lg" onClick="{{ finishCelebrate }}" dc-props="{{ btnFull }}" hint-size="100%,52px">Abschliessen &amp; feiern</x-import>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ─── TAB BAR ─── -->
+  <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;border-top:1px solid #EEEEEE;background:#FFFFFF;padding:6px 0 24px;flex:none">
+      <button onClick="{{ goGoals }}" style="{{ tabGoalsStyle }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"></circle></svg>
+        <span style="font-size:12px;font-weight:600">Ziele</span>
+      </button>
+      <button onClick="{{ goBoard }}" style="{{ tabBoardStyle }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="13" rx="1"></rect><rect x="10" y="4" width="5" height="9" rx="1"></rect><rect x="17" y="4" width="5" height="16" rx="1"></rect></svg>
+        <span style="font-size:12px;font-weight:600">Board</span>
+      </button>
+    </div>
+  </sc-if>
+
+  <!-- ─── CELEBRATED OVERLAY ─── -->
+  <sc-if value="{{ celebrated }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;z-index:80;background:rgba(26,26,26,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;animation:wwfade 0.3s ease-out">
+      <img src="assets/logo-white.png" alt="" style="width:64px;height:64px;object-fit:contain;animation:wwpop 0.5s ease-out">
+      <div style="font-family:'Source Serif 4','Cambria',serif;font-size:28px;font-weight:700;color:#FFFFFF;margin-top:22px">Gefeiert.</div>
+      <div style="font-size:15px;color:#BBBBBB;margin-top:8px;line-height:1.5">{{ celebratedMsg }}</div>
+      <button onClick="{{ dismissCelebrated }}" style="margin-top:30px;height:48px;padding:0 28px;border:none;background:#FC971C;color:#FFFFFF;font-size:16px;font-weight:600;border-radius:4px;cursor:pointer;font-family:'Source Sans 3',sans-serif" style-hover="background:#E07A00">Weiter gehts</button>
+    </div>
+  </sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:960},&quot;boardLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;swipe&quot;,&quot;stack&quot;,&quot;tabs&quot;],&quot;default&quot;:&quot;swipe&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Board&quot;,&quot;description&quot;:&quot;Wie die vier Spalten auf dem Phone dargestellt werden&quot;},&quot;aiFlow&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chat&quot;,&quot;prompt&quot;],&quot;default&quot;:&quot;chat&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;KI-Assistent&quot;,&quot;description&quot;:&quot;Chat-Dialog oder ein Freitext-Prompt&quot;}}">
+const STAGES = [
+  { key: 'options', label: 'Options', sub: 'Dinge, die ich in Betracht ziehe', limit: null, empty: 'Sammle hier Ideen. Klein anfangen. Konkret.', fwd: 'Ausprobieren →' },
+  { key: 'exploring', label: 'Exploring', sub: 'Meine ersten drei Versuche', limit: 3, empty: 'Noch nichts im Test — zieh eine Option weiter.', fwd: 'Meistern →' },
+  { key: 'mastering', label: 'Mastering', sub: 'Dranbleiben & Gewohnheit aufbauen', limit: 2, empty: 'Hier wird aus Versuchen Routine.', fwd: 'Feiern →' },
+  { key: 'celebrating', label: 'Celebrating', sub: 'Wirkung anschauen & würdigen', limit: null, empty: 'Noch nichts zu feiern — kommt.', fwd: null },
+];
+
+const GREETING = 'Hallo! Lass uns ein persönliches Ziel formulieren. Was möchtest du in den nächsten drei Monaten für dich verändern — und warum ist dir das wichtig?';
+
+const OKR_FORMAT = 'Antworte dann NUR mit einem JSON-Block in genau diesem Format, ohne weitere Sätze:\n```json\n{"objective":"Wertorientierter Zielsatz in Ich-Form, der einen erstrebenswerten zukünftigen Zustand beschreibt","keyResults":[{"text":"Kurze leitende Metrik","start":1,"target":3,"unit":"x / Woche"}]}\n```\n2 bis 3 Key Results. Alle Key Results sind leitende (leading) Metriken — Verhalten, das die Person selbst steuern kann — mit realistischen Zahlen. Objective und Key Results auf Deutsch, in Du-Form wo passend.';
+
+const SYSTEM_CHAT = 'Du bist ein erfahrener, warmer Coach von Wertwandler und hilfst einer Person, ein persönliches OKR-Set zu formulieren. Du duzt immer. Halte dich kurz: maximal 2 Sätze pro Antwort. Stelle höchstens zwei Rückfragen, eine nach der anderen, um zu verstehen, was die Person verändern will und woran sie Fortschritt merken würde. Sobald du genug weisst (spätestens nach der zweiten Antwort der Person): ' + OKR_FORMAT;
+
+const SYSTEM_PROMPT = 'Du bist ein erfahrener Coach von Wertwandler und formulierst aus der Beschreibung einer Person ein persönliches OKR-Set. ' + OKR_FORMAT;
+
+const SYSTEM_OPTIONS = 'Du bist ein erfahrener Coach von Wertwandler. Du bekommst ein persönliches OKR-Set (Objective + Key Results) und leitest daraus 5 bis 6 kleine, konkrete erste Schritte oder Experimente ab — "Options" für ein Personal Kanban Board. Jede Option: maximal 6 Wörter, als Handlung formuliert, sofort startbar, auf Deutsch. Antworte NUR mit einem JSON-Array von Strings, ohne weitere Sätze: ["Option eins","Option zwei"]';
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.chatRef = React.createRef();
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('wwpk-v1') || 'null'); } catch (e) { }
+    const goals = (saved && saved.goals) || [];
+    const cards = (saved && saved.cards) || [];
+    this.state = {
+      screen: goals.length ? 'board' : 'welcome',
+      goals: goals, cards: cards,
+      doneCount: (saved && saved.doneCount) || 0,
+      chat: [], chatInput: '', thinking: false,
+      promptInput: '', aiError: '',
+      draft: null, draftGoalId: null,
+      boardTab: 'options', selectedCardId: null,
+      newCardTitle: '', newCardGoalId: null,
+      celebrateCardId: null, celebrated: false, celebratedMsg: '',
+      blockNote: null,
+      kickoffGoalId: null, kickoffSuggestions: [], kickoffLoading: false, kickoffError: '', kickoffInput: '',
+    };
+  }
+
+  save() {
+    try {
+      localStorage.setItem('wwpk-v1', JSON.stringify({
+        goals: this.state.goals, cards: this.state.cards, doneCount: this.state.doneCount,
+      }));
+    } catch (e) { }
+  }
+  mut(patch) { this.setState(patch, () => this.save()); }
+  uid() { return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  componentDidUpdate() {
+    const el = this.chatRef.current;
+    if (el && this.state.screen === 'builder') el.scrollTop = el.scrollHeight;
+  }
+
+  // ── AI ──
+  parseOKR(text) {
+    let s = null;
+    const m = text.match(/```json([\s\S]*?)```/) || text.match(/```([\s\S]*?)```/);
+    if (m) s = m[1];
+    if (!s) {
+      const i = text.indexOf('{'), j = text.lastIndexOf('}');
+      if (i > -1 && j > i) s = text.slice(i, j + 1);
+    }
+    if (!s) return null;
+    try {
+      const o = JSON.parse(s);
+      if (o && o.objective && Array.isArray(o.keyResults) && o.keyResults.length) {
+        return {
+          objective: String(o.objective),
+          krs: o.keyResults.slice(0, 3).map((k) => ({
+            text: String(k.text || ''),
+            start: Number(k.start) || 0,
+            current: Number(k.start) || 0,
+            target: Number(k.target) || 1,
+            unit: String(k.unit || ''),
+          })),
+        };
+      }
+    } catch (e) { }
+    return null;
+  }
+
+  async doSendChat() {
+    const text = this.state.chatInput.trim();
+    if (!text || this.state.thinking) return;
+    const chat = this.state.chat.concat([{ role: 'user', text: text }]);
+    this.setState({ chat: chat, chatInput: '', thinking: true });
+    try {
+      const messages = chat
+        .filter((m, i) => !(i === 0 && m.role === 'assistant'))
+        .map((m) => ({ role: m.role, content: m.text }));
+      const res = await window.claude.complete({ system: SYSTEM_CHAT, messages: messages, max_tokens: 1200 });
+      const draft = this.parseOKR(res);
+      if (draft) {
+        this.setState({ thinking: false, draft: draft, draftGoalId: null, screen: 'draft' });
+      } else {
+        this.setState({ thinking: false, chat: chat.concat([{ role: 'assistant', text: res.trim() }]) });
+      }
+    } catch (e) {
+      this.setState({
+        thinking: false,
+        chat: chat.concat([{ role: 'assistant', text: 'Hmm, die KI ist gerade nicht erreichbar. Versuch es gleich nochmal.' }]),
+      });
+    }
+  }
+
+  async doGenFromPrompt() {
+    const text = this.state.promptInput.trim();
+    if (!text || this.state.thinking) return;
+    this.setState({ thinking: true, aiError: '' });
+    try {
+      const res = await window.claude.complete({ system: SYSTEM_PROMPT, messages: [{ role: 'user', content: text }], max_tokens: 1200 });
+      const draft = this.parseOKR(res);
+      if (draft) this.setState({ thinking: false, draft: draft, draftGoalId: null, screen: 'draft' });
+      else this.setState({ thinking: false, aiError: 'Das hat nicht geklappt — formuliere es nochmal etwas anders.' });
+    } catch (e) {
+      this.setState({ thinking: false, aiError: 'Die KI ist gerade nicht erreichbar. Versuch es gleich nochmal.' });
+    }
+  }
+
+  // ── Demo seed ──
+  seedDemo() {
+    const gid = this.uid();
+    const goals = [{
+      id: gid,
+      objective: 'Ich fühle mich energiegeladen, weil Bewegung ein fester Teil meiner Woche ist.',
+      krs: [
+        { text: 'Sporteinheiten pro Woche', start: 1, current: 2, target: 3, unit: 'x / Woche' },
+        { text: 'Schritte pro Tag im Schnitt', start: 5200, current: 6100, target: 8000, unit: 'Schritte' },
+      ],
+    }];
+    const cards = [
+      { id: this.uid(), goalId: gid, title: 'Bouldern ausprobieren', stage: 'options', tries: 0 },
+      { id: this.uid(), goalId: gid, title: 'Mit dem Rad zur Arbeit', stage: 'options', tries: 0 },
+      { id: this.uid(), goalId: gid, title: 'Morgens 10 Minuten dehnen', stage: 'exploring', tries: 2 },
+      { id: this.uid(), goalId: gid, title: 'Mittwochs zum Lauftreff', stage: 'mastering', tries: 3 },
+      { id: this.uid(), goalId: gid, title: 'Treppe statt Lift', stage: 'celebrating', tries: 3 },
+    ];
+    this.mut({ goals: goals, cards: cards, screen: 'board', newCardGoalId: gid });
+  }
+
+  // ── Draft ──
+  saveDraftGoal() {
+    const d = this.state.draft;
+    if (!d || !d.objective.trim()) return;
+    const krs = d.krs.filter((k) => k.text.trim()).map((k) => ({
+      text: k.text, start: Number(k.start) || 0,
+      current: this.state.draftGoalId ? (Number(k.current) || Number(k.start) || 0) : (Number(k.start) || 0),
+      target: Number(k.target) || 1, unit: k.unit,
+    }));
+    if (!krs.length) return;
+    let goals;
+    if (this.state.draftGoalId) {
+      goals = this.state.goals.map((g) => g.id === this.state.draftGoalId ? { id: g.id, objective: d.objective, krs: krs } : g);
+      this.mut({ goals: goals, draft: null, draftGoalId: null, screen: 'goals', chat: [], promptInput: '' });
+    } else {
+      if (this.state.goals.length >= 3) return;
+      const newGoal = { id: this.uid(), objective: d.objective, krs: krs };
+      goals = this.state.goals.concat([newGoal]);
+      this.mut({
+        goals: goals, draft: null, draftGoalId: null, chat: [], promptInput: '',
+        screen: 'kickoff', kickoffGoalId: newGoal.id, kickoffSuggestions: [], kickoffInput: '', newCardGoalId: newGoal.id,
+      });
+      this.genOptions(newGoal);
+    }
+  }
+
+  parseList(text) {
+    const i = text.indexOf('['), j = text.lastIndexOf(']');
+    if (i < 0 || j <= i) return null;
+    try {
+      const arr = JSON.parse(text.slice(i, j + 1));
+      if (Array.isArray(arr)) return arr.map((x) => String(x)).filter((x) => x.trim());
+    } catch (e) { }
+    return null;
+  }
+
+  async genOptions(goal) {
+    this.setState({ kickoffLoading: true, kickoffError: '' });
+    try {
+      const content = 'Objective: ' + goal.objective + '\nKey Results:\n' + goal.krs.map((k) => '- ' + k.text + ' (Start ' + k.start + ', Ziel ' + k.target + (k.unit ? ' ' + k.unit : '') + ')').join('\n');
+      const res = await window.claude.complete({ system: SYSTEM_OPTIONS, messages: [{ role: 'user', content: content }], max_tokens: 600 });
+      const arr = this.parseList(res);
+      if (arr && arr.length) {
+        this.setState({ kickoffLoading: false, kickoffSuggestions: arr.slice(0, 6).map((t, i) => ({ text: t, selected: i < 3 })) });
+      } else {
+        this.setState({ kickoffLoading: false, kickoffError: 'Das hat nicht geklappt — füg eigene Optionen hinzu oder versuch es nochmal.' });
+      }
+    } catch (e) {
+      this.setState({ kickoffLoading: false, kickoffError: 'Die KI ist gerade nicht erreichbar — füg eigene Optionen hinzu.' });
+    }
+  }
+
+  addKickoffOption() {
+    const t = this.state.kickoffInput.trim();
+    if (!t) return;
+    this.setState({ kickoffSuggestions: this.state.kickoffSuggestions.concat([{ text: t, selected: true }]), kickoffInput: '' });
+  }
+
+  // ── Board ──
+  moveCard(id, dir) {
+    const card = this.state.cards.find((c) => c.id === id);
+    if (!card) return;
+    const idx = STAGES.findIndex((s) => s.key === card.stage);
+    const ni = idx + dir;
+    if (ni < 0 || ni > 3) return;
+    const target = STAGES[ni];
+    if (dir > 0 && target.limit != null) {
+      const n = this.state.cards.filter((c) => c.stage === target.key).length;
+      if (n >= target.limit) {
+        this.setState({ blockNote: { id: id, text: target.label + ' ist voll (' + n + '/' + target.limit + ') — schliess dort zuerst etwas ab.' } });
+        return;
+      }
+    }
+    const cards = this.state.cards.map((c) => c.id === id ? Object.assign({}, c, { stage: target.key }) : c);
+    this.mut({ cards: cards, blockNote: null });
+  }
+
+  // ── Celebrate ──
+  krStepFor(kr) {
+    const span = Math.abs((Number(kr.target) || 1) - (Number(kr.start) || 0));
+    return Math.max(1, Math.round(span / 10));
+  }
+  stepKr(goalId, ki, delta) {
+    const goals = this.state.goals.map((g) => {
+      if (g.id !== goalId) return g;
+      const krs = g.krs.map((k, i) => {
+        if (i !== ki) return k;
+        const step = this.krStepFor(k);
+        return Object.assign({}, k, { current: Math.max(0, (Number(k.current) || 0) + delta * step) });
+      });
+      return Object.assign({}, g, { krs: krs });
+    });
+    this.mut({ goals: goals });
+  }
+
+  pct(kr) {
+    const s = Number(kr.start) || 0, t = Number(kr.target) || 1, c = Number(kr.current) || 0;
+    if (t === s) return c >= t ? 1 : 0;
+    return Math.max(0, Math.min(1, (c - s) / (t - s)));
+  }
+
+  renderVals() {
+    const st = this.state;
+    const layout = this.props.boardLayout || 'swipe';
+    const aiFlow = this.props.aiFlow || 'chat';
+    const screen = st.screen;
+
+    // ── screen flags ──
+    const isWelcome = screen === 'welcome';
+    const isBuilder = screen === 'builder';
+    const isDraft = screen === 'draft';
+    const isGoals = screen === 'goals';
+    const isBoard = screen === 'board';
+    const isCelebrate = screen === 'celebrate';
+    const isKickoff = screen === 'kickoff';
+
+    // ── kickoff ──
+    const kickoffGoal = st.goals.find((g) => g.id === st.kickoffGoalId);
+    const nKickoffSel = st.kickoffSuggestions.filter((s) => s.selected).length;
+    const kickoffSuggestions = st.kickoffSuggestions.map((s, i) => ({
+      text: s.text,
+      onTap: () => this.setState({ kickoffSuggestions: st.kickoffSuggestions.map((x, j) => j === i ? Object.assign({}, x, { selected: !x.selected }) : x) }),
+      style: {
+        display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', width: '100%',
+        minHeight: 48, padding: '12px 14px', boxSizing: 'border-box', borderRadius: 4, cursor: 'pointer',
+        background: '#2A2A2A', border: '1.5px solid ' + (s.selected ? '#FC971C' : '#3A3A3A'),
+        color: '#FFFFFF', fontSize: 15, fontFamily: "'Source Sans 3',sans-serif", lineHeight: 1.35,
+        transition: 'border-color .15s',
+      },
+      dotStyle: {
+        width: 11, height: 11, borderRadius: '50%', flex: 'none', boxSizing: 'border-box',
+        background: s.selected ? '#FC971C' : 'transparent',
+        border: '1.5px solid ' + (s.selected ? '#FC971C' : '#777777'),
+      },
+    }));
+
+    // ── chat ──
+    const chatMsgs = st.chat.map((m, i) => ({
+      text: m.text,
+      bubbleStyle: m.role === 'user'
+        ? { alignSelf: 'flex-end', maxWidth: '82%', background: '#1A1A1A', color: '#FFFFFF', padding: '11px 14px', borderRadius: '8px 8px 2px 8px', fontSize: 15, lineHeight: 1.45, whiteSpace: 'pre-wrap' }
+        : { alignSelf: 'flex-start', maxWidth: '86%', background: '#F7F7F7', border: '1px solid #EEEEEE', color: '#1A1A1A', padding: '11px 14px', borderRadius: '8px 8px 8px 2px', fontSize: 15, lineHeight: 1.45, whiteSpace: 'pre-wrap' },
+    }));
+
+    // ── draft ──
+    const d = st.draft || { objective: '', krs: [] };
+    const draftKrs = d.krs.map((k, i) => ({
+      text: k.text, start: k.start, target: k.target, unit: k.unit,
+      canRemove: d.krs.length > 2,
+      onText: (e) => this.patchKr(i, { text: e.target.value }),
+      onStart: (e) => this.patchKr(i, { start: e.target.value }),
+      onTarget: (e) => this.patchKr(i, { target: e.target.value }),
+      onUnit: (e) => this.patchKr(i, { unit: e.target.value }),
+      onRemove: () => this.setState({ draft: Object.assign({}, d, { krs: d.krs.filter((_, j) => j !== i) }) }),
+    }));
+
+    // ── goals ──
+    const goalVMs = st.goals.map((g, gi) => ({
+      label: 'Ziel ' + (gi + 1) + ' von 3',
+      objective: g.objective,
+      onEdit: () => this.setState({ draft: { objective: g.objective, krs: g.krs.map((k) => Object.assign({}, k)) }, draftGoalId: g.id, screen: 'draft' }),
+      krs: g.krs.map((k) => ({
+        text: k.text,
+        valueLabel: (Number(k.current) || 0) + ' / ' + (Number(k.target) || 0) + (k.unit ? ' ' + k.unit : ''),
+        fillStyle: { height: '100%', width: Math.round(this.pct(k) * 100) + '%', background: '#FC971C', borderRadius: 2, transition: 'width .3s ease-out' },
+      })),
+    }));
+
+    // ── board ──
+    const goalIndex = {};
+    st.goals.forEach((g, i) => { goalIndex[g.id] = i + 1; });
+    const counts = {};
+    STAGES.forEach((s) => { counts[s.key] = st.cards.filter((c) => c.stage === s.key).length; });
+
+    const mkCard = (c) => {
+      const si = STAGES.findIndex((s) => s.key === c.stage);
+      const stage = STAGES[si];
+      const expanded = st.selectedCardId === c.id;
+      const note = st.blockNote && st.blockNote.id === c.id ? st.blockNote.text : '';
+      return {
+        title: c.title,
+        goalTag: 'Z' + (goalIndex[c.goalId] || '?'),
+        expanded: expanded,
+        note: note,
+        showTries: c.stage === 'exploring',
+        triesLabel: (c.tries || 0) + '/3 Versuche',
+        tryDots: [0, 1, 2].map((i) => ({
+          style: {
+            width: 10, height: 10, borderRadius: '50%',
+            background: i < (c.tries || 0) ? '#FC971C' : 'transparent',
+            border: '1.5px solid ' + (i < (c.tries || 0) ? '#FC971C' : '#BBBBBB'),
+            boxSizing: 'border-box',
+          },
+        })),
+        canBack: si > 0,
+        canTry: c.stage === 'exploring' && (c.tries || 0) < 3,
+        canFwd: si < 3,
+        isCelebrating: c.stage === 'celebrating',
+        canDelete: c.stage === 'options',
+        fwdLabel: stage.fwd || '',
+        fwdStyle: { height: 40, padding: '0 14px', border: 'none', background: '#FC971C', color: '#FFFFFF', fontSize: 14, fontWeight: 600, borderRadius: 4, cursor: 'pointer', fontFamily: "'Source Sans 3',sans-serif" },
+        onTap: () => this.setState({ selectedCardId: expanded ? null : c.id, blockNote: null }),
+        onBack: (e) => { e.stopPropagation(); this.moveCard(c.id, -1); },
+        onFwd: (e) => { e.stopPropagation(); this.moveCard(c.id, 1); },
+        onTry: (e) => {
+          e.stopPropagation();
+          const cards = st.cards.map((x) => x.id === c.id ? Object.assign({}, x, { tries: Math.min(3, (x.tries || 0) + 1) }) : x);
+          this.mut({ cards: cards });
+        },
+        onReview: (e) => { e.stopPropagation(); this.setState({ celebrateCardId: c.id, screen: 'celebrate', selectedCardId: null }); },
+        onDelete: (e) => { e.stopPropagation(); this.mut({ cards: st.cards.filter((x) => x.id !== c.id), selectedCardId: null }); },
+      };
+    };
+
+    const colStyle = layout === 'swipe'
+      ? { width: 300, flex: 'none', scrollSnapAlign: 'start', background: '#EEEEEE', borderRadius: 6, padding: '14px 12px 16px', boxSizing: 'border-box' }
+      : layout === 'stack'
+        ? { background: '#EEEEEE', borderRadius: 6, padding: '14px 12px 16px' }
+        : { padding: '4px 2px' };
+
+    const columns = STAGES.map((s) => {
+      const cardsIn = st.cards.filter((c) => c.stage === s.key);
+      const atLimit = s.limit != null && cardsIn.length >= s.limit;
+      return {
+        key: s.key, label: s.label, sub: s.sub,
+        countLabel: s.limit != null ? cardsIn.length + '/' + s.limit : String(cardsIn.length),
+        countStyle: { marginLeft: 'auto', fontSize: 12, fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: atLimit ? '#E07A00' : '#999999' },
+        style: colStyle,
+        cards: cardsIn.map(mkCard),
+        isEmpty: cardsIn.length === 0 && s.key !== 'options',
+        emptyText: s.empty,
+        isOptions: s.key === 'options',
+      };
+    });
+    const visibleColumns = layout === 'tabs' ? columns.filter((c) => c.key === st.boardTab) : columns;
+
+    const boardWrapStyle = layout === 'swipe'
+      ? { flex: 1, overflow: 'auto', display: 'flex', gap: 12, padding: '6px 16px 24px', scrollSnapType: 'x mandatory', alignItems: 'flex-start' }
+      : layout === 'stack'
+        ? { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16, padding: '6px 16px 24px' }
+        : { flex: 1, overflowY: 'auto', padding: '2px 16px 24px' };
+
+    const segTabs = STAGES.map((s) => {
+      const active = st.boardTab === s.key;
+      return {
+        label: s.label,
+        onTap: () => this.setState({ boardTab: s.key, selectedCardId: null, blockNote: null }),
+        style: {
+          flex: 1, height: 40, border: 'none', borderRadius: 4, cursor: 'pointer',
+          fontFamily: "'Source Sans 3',sans-serif", fontSize: 11.5, fontWeight: 600,
+          background: active ? '#1A1A1A' : '#EEEEEE', color: active ? '#FFFFFF' : '#595959',
+          padding: 0, transition: 'background .15s',
+        },
+      };
+    });
+
+    const goalChips = st.goals.map((g, i) => {
+      const active = (st.newCardGoalId || (st.goals[0] && st.goals[0].id)) === g.id;
+      return {
+        label: 'Z' + (i + 1),
+        onTap: () => this.setState({ newCardGoalId: g.id }),
+        style: {
+          height: 32, padding: '0 12px', borderRadius: 2, cursor: 'pointer',
+          fontFamily: "'Source Sans 3',sans-serif", fontSize: 12.5, fontWeight: 600,
+          border: '1.5px solid ' + (active ? '#FC971C' : '#D9D9D9'),
+          background: active ? '#FFF3E0' : 'transparent', color: active ? '#E07A00' : '#595959',
+        },
+      };
+    });
+
+    // ── celebrate ──
+    const celCard = st.cards.find((c) => c.id === st.celebrateCardId);
+    const celGoal = celCard ? st.goals.find((g) => g.id === celCard.goalId) : null;
+    const celebrateKrs = celGoal ? celGoal.krs.map((k, i) => {
+      const delta = (Number(k.current) || 0) - (Number(k.start) || 0);
+      return {
+        text: k.text,
+        currentLabel: String(Number(k.current) || 0),
+        metaLabel: 'Start ' + (Number(k.start) || 0) + ' · Ziel ' + (Number(k.target) || 0) + (k.unit ? ' ' + k.unit : ''),
+        improved: delta > 0,
+        deltaLabel: '+' + delta + ' seit Start',
+        onMinus: () => this.stepKr(celGoal.id, i, -1),
+        onPlus: () => this.stepKr(celGoal.id, i, 1),
+      };
+    }) : [];
+
+    // ── tab bar ──
+    const tabStyle = (active) => ({
+      flex: 1, minHeight: 52, border: 'none', background: 'transparent', cursor: 'pointer',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3,
+      color: active ? '#FC971C' : '#999999', fontFamily: "'Source Sans 3',sans-serif",
+    });
+
+    return {
+      // flags
+      isWelcome, isBuilder, isDraft, isGoals, isBoard, isCelebrate, isKickoff,
+      isChatFlow: aiFlow === 'chat', isPromptFlow: aiFlow !== 'chat',
+      layoutTabs: layout === 'tabs',
+      statusDark: isWelcome || isCelebrate || isKickoff || st.celebrated,
+      // kickoff
+      kickoffObjective: kickoffGoal ? kickoffGoal.objective : '',
+      kickoffSuggestions,
+      kickoffLoading: st.kickoffLoading, kickoffError: st.kickoffError, kickoffInput: st.kickoffInput,
+      kickoffCanRegen: !st.kickoffLoading && !!kickoffGoal,
+      kickoffCta: nKickoffSel > 0 ? nKickoffSel + ' aufs Board übernehmen' : 'Ohne Optionen weiter',
+      onKickoffInput: (e) => this.setState({ kickoffInput: e.target.value }),
+      onKickoffKey: (e) => { if (e.key === 'Enter') this.addKickoffOption(); },
+      addKickoffOwn: () => this.addKickoffOption(),
+      regenOptions: () => { if (kickoffGoal) this.genOptions(kickoffGoal); },
+      kickoffToBoard: () => {
+        const sel = st.kickoffSuggestions.filter((s) => s.selected);
+        this.mut({
+          cards: st.cards.concat(sel.map((s) => ({ id: this.uid(), goalId: st.kickoffGoalId, title: s.text, stage: 'options', tries: 0 }))),
+          screen: 'board', kickoffGoalId: null, kickoffSuggestions: [], kickoffInput: '', kickoffError: '',
+        });
+      },
+      kickoffSkip: () => this.setState({ screen: 'board', kickoffGoalId: null, kickoffSuggestions: [], kickoffInput: '', kickoffError: '' }),
+      showTabs: isGoals || isBoard,
+      // misc
+      three: 3, six: 6,
+      btnFull: { style: { width: '100%' } },
+      introStages: STAGES.map((s) => ({ label: s.label, sub: s.sub })),
+      builderSub: aiFlow === 'chat' ? 'Die KI hilft dir beim Formulieren' : 'Ein Satz von dir — ein Entwurf von der KI',
+      chatRef: this.chatRef,
+      chatMsgs, chatInput: st.chatInput, thinking: st.thinking,
+      promptInput: st.promptInput, aiError: st.aiError,
+      // draft
+      draftTitle: st.draftGoalId ? 'Ziel bearbeiten' : 'Dein OKR-Entwurf',
+      draftObjective: d.objective, draftKrs,
+      canAddKr: !!st.draft && d.krs.length < 3,
+      isEditingGoal: !!st.draftGoalId,
+      onDraftObjective: (e) => this.setState({ draft: Object.assign({}, d, { objective: e.target.value }) }),
+      addKr: () => this.setState({ draft: Object.assign({}, d, { krs: d.krs.concat([{ text: '', start: 0, current: 0, target: 1, unit: '' }]) }) }),
+      saveDraft: () => this.saveDraftGoal(),
+      deleteGoal: () => {
+        const gid = this.state.draftGoalId;
+        this.mut({ goals: st.goals.filter((g) => g.id !== gid), cards: st.cards.filter((c) => c.goalId !== gid), draft: null, draftGoalId: null, screen: 'goals' });
+      },
+      // goals
+      goalVMs,
+      goalCountLabel: st.goals.length + ' / 3',
+      hasNoGoals: st.goals.length === 0,
+      canAddGoal: st.goals.length < 3,
+      atGoalLimit: st.goals.length >= 3,
+      // board
+      boardNoGoals: st.goals.length === 0,
+      boardHasGoals: st.goals.length > 0,
+      visibleColumns, boardWrapStyle, segTabs, goalChips,
+      manyGoals: st.goals.length > 1,
+      newCardTitle: st.newCardTitle,
+      onNewCardTitle: (e) => this.setState({ newCardTitle: e.target.value }),
+      onNewCardKey: (e) => { if (e.key === 'Enter') this.doAddCard(); },
+      addCard: () => this.doAddCard(),
+      hasDone: st.doneCount > 0,
+      doneLabel: st.doneCount + ' gefeiert',
+      // celebrate
+      celebrateTitle: celCard ? celCard.title : '',
+      celebrateGoalObjective: celGoal ? celGoal.objective : '',
+      celebrateKrs,
+      finishCelebrate: () => {
+        const n = st.doneCount + 1;
+        this.mut({
+          cards: st.cards.filter((c) => c.id !== st.celebrateCardId),
+          doneCount: n, celebrateCardId: null, celebrated: true,
+          celebratedMsg: 'Erfolg Nr. ' + n + '. Schau auf deine Zahlen — und weiter gehts.',
+          screen: 'board',
+        });
+      },
+      backToBoard: () => this.setState({ screen: 'board', celebrateCardId: null }),
+      celebrated: st.celebrated, celebratedMsg: st.celebratedMsg,
+      dismissCelebrated: () => this.setState({ celebrated: false }),
+      // nav
+      goGoals: () => this.setState({ screen: 'goals', selectedCardId: null }),
+      goBoard: () => this.setState({ screen: 'board' }),
+      tabGoalsStyle: tabStyle(isGoals),
+      tabBoardStyle: tabStyle(isBoard),
+      goBack: () => this.setState({ screen: st.goals.length ? 'goals' : 'welcome', draft: null, draftGoalId: null }),
+      startBuilder: () => this.setState({ screen: 'builder', chat: [{ role: 'assistant', text: GREETING }], chatInput: '', promptInput: '', aiError: '', thinking: false }),
+      seedDemo: () => this.seedDemo(),
+      resetAll: () => {
+        try { localStorage.removeItem('wwpk-v1'); } catch (e) { }
+        this.setState({ goals: [], cards: [], doneCount: 0, screen: 'welcome', chat: [], draft: null, draftGoalId: null, selectedCardId: null, celebrateCardId: null, celebrated: false });
+      },
+      // chat handlers
+      onChatInput: (e) => this.setState({ chatInput: e.target.value }),
+      onChatKey: (e) => { if (e.key === 'Enter') this.doSendChat(); },
+      sendChat: () => this.doSendChat(),
+      onPromptInput: (e) => this.setState({ promptInput: e.target.value }),
+      genFromPrompt: () => this.doGenFromPrompt(),
+    };
+  }
+
+  patchKr(i, patch) {
+    const d = this.state.draft;
+    this.setState({ draft: Object.assign({}, d, { krs: d.krs.map((k, j) => j === i ? Object.assign({}, k, patch) : k) }) });
+  }
+
+  doAddCard() {
+    const title = this.state.newCardTitle.trim();
+    if (!title || !this.state.goals.length) return;
+    const gid = this.state.newCardGoalId || this.state.goals[0].id;
+    this.mut({
+      cards: this.state.cards.concat([{ id: this.uid(), goalId: gid, title: title, stage: 'options', tries: 0 }]),
+      newCardTitle: '',
+    });
+  }
+}
+</script>
+</body>
+</html>
