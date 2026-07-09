@@ -4,7 +4,7 @@ A lightweight mobile-first web app: an AI-assisted OKR builder (max. 3 goals) fe
 
 This is the real implementation of the `Personal Kanban App.dc.html` design exported from Claude Design (see `chats/` and `project/` for the original design bundle). Design fidelity notes:
 
-- **Board layout**: swipe-scroll columns (the design tool's default).
+- **Board layout**: segmented tab bar (Options / Exploring / Mastering / Celebrating), one column visible at a time — one of three layouts the original prototype's tweak panel supported (swipe / stack / tabs).
 - **AI builder flow**: chat dialog (the design tool's default) — the alternate single-prompt flow from the prototype was dropped.
 - **Device chrome**: the iPhone bezel/status-bar from the design preview is presentation-only and was not carried over; this runs as a normal responsive mobile-first web page instead.
 

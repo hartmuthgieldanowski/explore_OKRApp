@@ -99,6 +99,7 @@ function MainApp({ user, onCredential, onSignOut, authError }) {
           newCardTitle={s.newCardTitle}
           newCardGoalId={s.newCardGoalId}
           blockNote={s.blockNote}
+          onClearBlockNote={() => s.setBlockNote(null)}
           onStartBuilder={s.startBuilder}
           onSelectCard={s.setSelectedCardId}
           onMoveCard={s.moveCard}

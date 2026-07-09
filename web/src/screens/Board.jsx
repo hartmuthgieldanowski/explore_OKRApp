@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Button from '../components/Button';
 import BoardCard from '../components/BoardCard';
 import { FONT_SERIF, STAGES, HEADER_PAD_TOP } from '../theme';
@@ -19,11 +20,20 @@ export default function Board({
   onNewCardTitleChange,
   onAddCard,
   onSelectNewCardGoal,
+  onClearBlockNote,
 }) {
+  const [boardTab, setBoardTab] = useState(STAGES[0].key);
+
   const boardNoGoals = goals.length === 0;
   const boardHasGoals = goals.length > 0;
   const hasDone = doneCount > 0;
   const manyGoals = goals.length > 1;
+
+  const selectTab = (key) => {
+    setBoardTab(key);
+    onSelectCard(null);
+    onClearBlockNote();
+  };
 
   const goalIndex = {};
   goals.forEach((g, i) => {
@@ -58,17 +68,43 @@ export default function Board({
       )}
 
       {boardHasGoals && (
-        <div style={{ flex: 1, overflow: 'auto', display: 'flex', gap: 12, padding: '6px 16px 24px', scrollSnapType: 'x mandatory', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: 4, padding: '6px 16px 10px', flex: 'none' }}>
           {STAGES.map((s) => {
+            const active = boardTab === s.key;
+            return (
+              <button
+                key={s.key}
+                onClick={() => selectTab(s.key)}
+                style={{
+                  flex: 1,
+                  height: 40,
+                  border: 'none',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  fontFamily: "'Source Sans 3',sans-serif",
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  background: active ? '#1A1A1A' : '#EEEEEE',
+                  color: active ? '#FFFFFF' : '#595959',
+                  transition: 'background .15s',
+                }}
+              >
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {boardHasGoals && (
+        <div style={{ flex: 1, overflowY: 'auto', padding: '2px 16px 24px' }}>
+          {STAGES.filter((s) => s.key === boardTab).map((s) => {
             const cardsIn = cards.filter((c) => c.stage === s.key);
             const atLimit = s.limit != null && cardsIn.length >= s.limit;
             const isEmpty = cardsIn.length === 0 && s.key !== 'options';
             const isOptions = s.key === 'options';
             return (
-              <div
-                key={s.key}
-                style={{ width: 300, flex: 'none', scrollSnapAlign: 'start', background: '#EEEEEE', borderRadius: 6, padding: '14px 12px 16px', boxSizing: 'border-box' }}
-              >
+              <div key={s.key} style={{ padding: '4px 2px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                   <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#FC971C', flex: 'none', alignSelf: 'center' }} />
                   <span style={{ fontFamily: FONT_SERIF, fontWeight: 700, fontSize: 17, color: '#1A1A1A' }}>{s.label}</span>
