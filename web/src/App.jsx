@@ -1,6 +1,5 @@
-import { useAppState } from './store/useAppState';
+import { useAppState, GUEST_ID } from './store/useAppState';
 import { useAuth } from './store/useAuth';
-import SignIn from './screens/SignIn';
 import Welcome from './screens/Welcome';
 import Builder from './screens/Builder';
 import Draft from './screens/Draft';
@@ -11,8 +10,8 @@ import Celebrate from './screens/Celebrate';
 import TabBar from './components/TabBar';
 import CelebratedOverlay from './components/CelebratedOverlay';
 
-function AuthedApp({ user, onSignOut }) {
-  const s = useAppState(user.id);
+function MainApp({ user, onCredential, onSignOut, authError }) {
+  const s = useAppState(user ? user.id : GUEST_ID);
 
   const isWelcome = s.screen === 'welcome';
   const isBuilder = s.screen === 'builder';
@@ -85,7 +84,9 @@ function AuthedApp({ user, onSignOut }) {
           onAddGoal={s.startBuilder}
           onReset={s.resetAll}
           user={user}
+          onCredential={onCredential}
           onSignOut={onSignOut}
+          authError={authError}
         />
       )}
 
@@ -130,17 +131,11 @@ function AuthedApp({ user, onSignOut }) {
 export default function App() {
   const { user, loading, error, onCredential, signOut } = useAuth();
 
+  // Brief, so the app doesn't render as a guest for a flash and then swap in
+  // an already-signed-in account's data once the session check resolves.
   if (loading) {
     return <div className="ww-app-shell" style={{ background: '#1A1A1A' }} />;
   }
 
-  if (!user) {
-    return (
-      <div className="ww-app-shell">
-        <SignIn onCredential={onCredential} error={error} />
-      </div>
-    );
-  }
-
-  return <AuthedApp user={user} onSignOut={signOut} />;
+  return <MainApp user={user} onCredential={onCredential} onSignOut={signOut} authError={error} />;
 }

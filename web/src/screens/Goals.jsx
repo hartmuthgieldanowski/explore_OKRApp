@@ -1,8 +1,9 @@
 import Button from '../components/Button';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 import { FONT_SERIF, HEADER_PAD_TOP } from '../theme';
 import { pct } from '../store/useAppState';
 
-export default function Goals({ goals, onEdit, onAddGoal, onReset, user, onSignOut }) {
+export default function Goals({ goals, onEdit, onAddGoal, onReset, user, onCredential, onSignOut, authError }) {
   const hasNoGoals = goals.length === 0;
   const canAddGoal = goals.length < 3;
   const atGoalLimit = goals.length >= 3;
@@ -16,19 +17,31 @@ export default function Goals({ goals, onEdit, onAddGoal, onReset, user, onSignO
           {goals.length} / 3
         </span>
       </div>
-      {user && (
-        <div style={{ padding: '0 20px 12px', display: 'flex', alignItems: 'center', gap: 8, background: '#F7F7F7', flex: 'none' }}>
-          {user.picture && (
-            <img src={user.picture} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
-          )}
-          <span style={{ fontSize: 13, color: '#595959' }}>{user.name || user.email}</span>
-          <button
-            onClick={onSignOut}
-            style={{ marginLeft: 'auto', border: 'none', background: 'transparent', color: '#999999', fontSize: 12.5, cursor: 'pointer', fontFamily: "'Source Sans 3',sans-serif", textDecoration: 'underline' }}
-          >
-            Abmelden
-          </button>
-        </div>
+      <div style={{ padding: '0 20px 12px', display: 'flex', alignItems: 'center', gap: 8, background: '#F7F7F7', flex: 'none' }}>
+        {user ? (
+          <>
+            {user.picture && (
+              <img src={user.picture} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
+            )}
+            <span style={{ fontSize: 13, color: '#595959' }}>{user.name || user.email}</span>
+            <button
+              onClick={onSignOut}
+              style={{ marginLeft: 'auto', border: 'none', background: 'transparent', color: '#999999', fontSize: 12.5, cursor: 'pointer', fontFamily: "'Source Sans 3',sans-serif", textDecoration: 'underline' }}
+            >
+              Abmelden
+            </button>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize: 13, color: '#777777' }}>Ohne Konto — Daten bleiben auf diesem Gerät.</span>
+            <div style={{ marginLeft: 'auto' }}>
+              <GoogleSignInButton onCredential={onCredential} size="medium" />
+            </div>
+          </>
+        )}
+      </div>
+      {authError && (
+        <div style={{ padding: '0 20px 12px', fontSize: 12.5, color: '#C62828', background: '#F7F7F7', flex: 'none' }}>{authError}</div>
       )}
       <div style={{ flex: 1, overflow: 'auto', padding: '6px 16px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {goals.map((g, gi) => (

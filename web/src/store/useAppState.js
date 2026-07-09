@@ -4,21 +4,23 @@ import { complete } from '../api/claude';
 import { GREETING, SYSTEM_CHAT, SYSTEM_OPTIONS } from './prompts';
 
 const LEGACY_STORAGE_KEY = 'wwpk-v1';
+export const GUEST_ID = 'guest';
 
 function uid() {
   return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-function storageKeyFor(userId) {
-  return `${LEGACY_STORAGE_KEY}:${userId}`;
+function storageKeyFor(id) {
+  return `${LEGACY_STORAGE_KEY}:${id}`;
 }
 
-// One-time migration: the app used to have no accounts at all, so any data
-// from before sign-in lived under the shared LEGACY_STORAGE_KEY. Hand it to
-// whichever account signs in first, then clear the shared key so it isn't
-// re-claimed by a second account later.
-function loadSaved(userId) {
-  const key = storageKeyFor(userId);
+// Sign-in is opt-in — most usage stays anonymous under GUEST_ID, same as the
+// app worked before accounts existed. If someone chooses to add a Google
+// account, their existing on-device (guest) data follows them into their own
+// namespaced key instead of appearing to vanish. Also migrates data from the
+// app's original, pre-accounts unnamespaced key into the guest bucket.
+function loadSaved(id) {
+  const key = storageKeyFor(id);
   try {
     const own = localStorage.getItem(key);
     if (own) return JSON.parse(own);
@@ -28,6 +30,14 @@ function loadSaved(userId) {
       localStorage.setItem(key, legacy);
       localStorage.removeItem(LEGACY_STORAGE_KEY);
       return JSON.parse(legacy);
+    }
+
+    if (id !== GUEST_ID) {
+      const guest = localStorage.getItem(storageKeyFor(GUEST_ID));
+      if (guest) {
+        localStorage.setItem(key, guest);
+        return JSON.parse(guest);
+      }
     }
     return null;
   } catch (e) {
