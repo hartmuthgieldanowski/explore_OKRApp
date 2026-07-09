@@ -1,4 +1,6 @@
 import { useAppState } from './store/useAppState';
+import { useAuth } from './store/useAuth';
+import SignIn from './screens/SignIn';
 import Welcome from './screens/Welcome';
 import Builder from './screens/Builder';
 import Draft from './screens/Draft';
@@ -9,8 +11,8 @@ import Celebrate from './screens/Celebrate';
 import TabBar from './components/TabBar';
 import CelebratedOverlay from './components/CelebratedOverlay';
 
-export default function App() {
-  const s = useAppState();
+function AuthedApp({ user, onSignOut }) {
+  const s = useAppState(user.id);
 
   const isWelcome = s.screen === 'welcome';
   const isBuilder = s.screen === 'builder';
@@ -77,7 +79,14 @@ export default function App() {
       )}
 
       {isGoals && (
-        <Goals goals={s.goals} onEdit={s.startEditGoal} onAddGoal={s.startBuilder} onReset={s.resetAll} />
+        <Goals
+          goals={s.goals}
+          onEdit={s.startEditGoal}
+          onAddGoal={s.startBuilder}
+          onReset={s.resetAll}
+          user={user}
+          onSignOut={onSignOut}
+        />
       )}
 
       {isBoard && (
@@ -116,4 +125,22 @@ export default function App() {
       {s.celebrated && <CelebratedOverlay message={s.celebratedMsg} onDismiss={s.dismissCelebrated} />}
     </div>
   );
+}
+
+export default function App() {
+  const { user, loading, error, onCredential, signOut } = useAuth();
+
+  if (loading) {
+    return <div className="ww-app-shell" style={{ background: '#1A1A1A' }} />;
+  }
+
+  if (!user) {
+    return (
+      <div className="ww-app-shell">
+        <SignIn onCredential={onCredential} error={error} />
+      </div>
+    );
+  }
+
+  return <AuthedApp user={user} onSignOut={signOut} />;
 }

@@ -32,7 +32,16 @@ web/      React + Vite front end
 
    Without a key, everything works except the AI-assisted OKR builder and the "derive first options" step on the kickoff screen — those show a friendly "KI ist gerade nicht erreichbar" message instead of erroring out.
 
-3. **Run both the API server and the web app**:
+3. **Set up Google sign-in**:
+
+   - In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an **OAuth client ID** of type **Web application**, with Authorized JavaScript origins `http://localhost:5173` and your production URL. No redirect URI is needed — the app uses the token-based Sign In With Google flow, not the redirect flow.
+   - Set the resulting Client ID in **both** `server/.env` (`GOOGLE_CLIENT_ID=`) and `web/.env` (`VITE_GOOGLE_CLIENT_ID=`, copy from `web/.env.example`) — same value, two names, because Vite only exposes `VITE_`-prefixed vars to client code.
+   - Generate a random session-signing secret and set it in `server/.env`:
+     ```sh
+     openssl rand -hex 32   # → SESSION_SECRET=...
+     ```
+
+4. **Run both the API server and the web app**:
 
    ```sh
    npm run dev
@@ -49,5 +58,6 @@ npm run server     # or: node server/index.js (with server/.env / env vars set),
 
 ## Notes
 
-- State (goals, cards, celebration count) persists to `localStorage` only — there's no backend database or accounts, matching the original "keep it minimal" brief.
+- Sign-in is Google only, via [Google Identity Services](https://developers.google.com/identity/gsi/web) (the "Sign In With Google" button). The client posts the resulting ID token to `POST /api/auth/google`, which verifies it against Google's public keys (`google-auth-library`, no client secret needed) and issues its own signed session cookie (`jsonwebtoken`, httpOnly, 30 days) — `GET /api/auth/me` and `POST /api/auth/logout` read/clear it.
+- State (goals, cards, celebration count) still persists to `localStorage` only — there's no backend database. Google sign-in is identity/personalization only; it does not sync data across devices. The storage key is namespaced per signed-in Google account (`wwpk-v1:<google-user-id>`) so a shared device can't mix up two people's data. Data from before accounts existed is migrated into whichever account signs in first.
 - The AI calls are a thin proxy: the client posts `{ system, messages, max_tokens }` to `POST /api/complete` and the server forwards it to the Anthropic Messages API (`claude-opus-4-8`), capped at 2000 output tokens per request, with basic rate limiting.

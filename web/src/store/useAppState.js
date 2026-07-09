@@ -3,15 +3,33 @@ import { STAGES } from '../theme';
 import { complete } from '../api/claude';
 import { GREETING, SYSTEM_CHAT, SYSTEM_OPTIONS } from './prompts';
 
-const STORAGE_KEY = 'wwpk-v1';
+const LEGACY_STORAGE_KEY = 'wwpk-v1';
 
 function uid() {
   return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-function loadSaved() {
+function storageKeyFor(userId) {
+  return `${LEGACY_STORAGE_KEY}:${userId}`;
+}
+
+// One-time migration: the app used to have no accounts at all, so any data
+// from before sign-in lived under the shared LEGACY_STORAGE_KEY. Hand it to
+// whichever account signs in first, then clear the shared key so it isn't
+// re-claimed by a second account later.
+function loadSaved(userId) {
+  const key = storageKeyFor(userId);
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    const own = localStorage.getItem(key);
+    if (own) return JSON.parse(own);
+
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (legacy) {
+      localStorage.setItem(key, legacy);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      return JSON.parse(legacy);
+    }
+    return null;
   } catch (e) {
     return null;
   }
@@ -73,8 +91,8 @@ export function pct(kr) {
   return Math.max(0, Math.min(1, (c - s) / (t - s)));
 }
 
-export function useAppState() {
-  const saved = loadSaved();
+export function useAppState(userId) {
+  const saved = loadSaved(userId);
   const initialGoals = (saved && saved.goals) || [];
   const initialCards = (saved && saved.cards) || [];
 
@@ -109,16 +127,19 @@ export function useAppState() {
 
   const chatRef = useRef(null);
 
-  const persist = useCallback((nextGoals, nextCards, nextDoneCount) => {
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ goals: nextGoals, cards: nextCards, doneCount: nextDoneCount })
-      );
-    } catch (e) {
-      /* ignore persistence failures */
-    }
-  }, []);
+  const persist = useCallback(
+    (nextGoals, nextCards, nextDoneCount) => {
+      try {
+        localStorage.setItem(
+          storageKeyFor(userId),
+          JSON.stringify({ goals: nextGoals, cards: nextCards, doneCount: nextDoneCount })
+        );
+      } catch (e) {
+        /* ignore persistence failures */
+      }
+    },
+    [userId]
+  );
 
   const mutGoals = useCallback(
     (updater) => {
@@ -174,7 +195,7 @@ export function useAppState() {
 
   const resetAll = useCallback(() => {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(storageKeyFor(userId));
     } catch (e) {
       /* ignore */
     }
@@ -188,7 +209,7 @@ export function useAppState() {
     setSelectedCardId(null);
     setCelebrateCardId(null);
     setCelebrated(false);
-  }, []);
+  }, [userId]);
 
   // ── demo seed ──
   const seedDemo = useCallback(() => {
